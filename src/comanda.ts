@@ -11,34 +11,42 @@ function subtotal(preco: number, qtd: number): number {
 
 
 export class ItemComanda {
-    nome: string; //propriedade
-    precoCentavos: number;
-    quantidade: number;
+    readonly nome: string; //propriedade
+    readonly precoCentavos: number;
+    readonly quantidade: number;
 
     constructor(nome: string, precoCentavos: number, quantidade: number){ //parâmetros
+        if(precoCentavos < 0){
+            throw new Error(`Preço negativo em ${nome}`)
+        }
+        if(quantidade <= 0){
+            throw new Error(`Quantidade de ${nome} precisa ser maior que 0`)
+        }
         this.nome = nome;
         this.precoCentavos = precoCentavos; //case sensitive ( sensível a caixa )
         this.quantidade = quantidade;
     }
 
     subTotal(): number{
-        return this.precoCentavos * this.quantidade
+        return this.precoCentavos * this.quantidade;
     }
 }
 
 export class Comanda {
-    mesa: number;
-    itens: ItemComanda[] = [];
-    aberta: boolean = true;
+    readonly mesa: number;
+    private itens: ItemComanda[] = [];
+    private aberta: boolean = true;
 
     constructor(mesa: number){
         this.mesa = mesa;
     }
 
-    adicionar(item: ItemComanda): void{
+    adicionar(item: ItemComanda): boolean{
         if(this.aberta === true){
             this.itens.push(item)
+            return true;
         }
+        return false
     }
 
     total(): number {
@@ -53,7 +61,7 @@ export class Comanda {
 
     fechar(): string {
         this.aberta = false;
-        return "Mesa" + this.mesa + " R$ " + this.total * 100.toFixed(2)
+        return "Mesa" + this.mesa + " R$ " + (this.total()/100).toFixed(2)
 
     }
 }
